@@ -1,10 +1,10 @@
-Class web.index Extends %CSP.Page
+Class web.Teacher Extends %CSP.Page
 {
 
 ClassMethod OnPage() As %Status
 {
   do ..header()
-  do ##class(web.index).body()
+  do ##class(web.Teacher).body()
   do ..footer()
     Quit $$$OK
 }

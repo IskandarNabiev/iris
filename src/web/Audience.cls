@@ -1,10 +1,10 @@
-Class web.index Extends %CSP.Page
+Class web.Audience Extends %CSP.Page
 {
 
 ClassMethod OnPage() As %Status
 {
   do ..header()
-  do ##class(web.index).body()
+  do ##class(web.Audience).body()
   do ..footer()
     Quit $$$OK
 }
@@ -16,7 +16,7 @@ ClassMethod header() As %Status
     <head>
       <script type="text/javascript" src="webix/webix.min.js" ></script>
       <link rel="stylesheet" type="text/css" href="webix/webix.min.css">
-    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.7.94/css/materialdesignicons.css?v=7.2.0" type="text/css" charset="utf-8">
+      <link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.7.94/css/materialdesignicons.css?v=7.2.0" type="text/css" charset="utf-8">
     </head>
   >
 
@@ -31,7 +31,7 @@ ClassMethod body() As %Status
     let data = JSON.parse(rawData);
     let message;
     if (data.result) {
-      message = { type:"success", text: "Преподаватель добавлен", expire: 2000};
+      message = { type:"success", text: "Группа добавлена", expire: 2000};
       $$('tab2_content').clear();
     }
     else
@@ -40,26 +40,26 @@ ClassMethod body() As %Status
   }
 
 var menu_data = [
-	{id: "tab1", icon: "mdi mdi-table", value:"Список преподавателей"},
-	{id: "tab2", icon: "mdi mdi-teach", value:"Добавить преподавателя"},
+	{id: "tab1", icon: "mdi mdi-table", value:"Список групп"},
+	{id: "tab2", icon: "mdi  mdi-account-multiple-outline", value:"Добавить группу"},
 ];
 
 var onDelete = () => {
   alert("delete")
 };
 
-var teacher_list_template = {
+var group_list_template = {
   id:"tab1_content",
   view:"list",
-  template:"<div style='padding-left:18px'> ФИО:#fio# </div> <button class='webix_remove_upload' click='onDelete()'>Удалить</button>",
+  template:"<div style='padding-left:18px'> Курс:#course#, Спец:#spes# </div> <button class='webix_remove_upload' click='onDelete()'>Удалить</button>",
   type:{
     height:60
   },
   select:true,  
-  url:"/api_sc/teacher/list",
+  url:"/api_sc/group/list",
     onClick:{
         "webix_remove_upload":function(ev, id){
-            webix.ajax().del("/api_sc/teacher/delete?id="+id, { id : id }).then((data) => {
+            webix.ajax().del("/api_sc/group/delete?id="+id, { id : id }).then((data) => {
               this.remove(id);
             });
             return false; // blocks the default click behavior
@@ -71,17 +71,18 @@ var teacher_list_template = {
   };
 
 
-var teacher_form_template = {
+var group_form_template = {
   id:"tab2_content",
   view:"form",
   width: "400",
   elements:[
-    {view: "text", name: "fio", label: "ФИО"},
-    { view:"button",  value:"Добавить", id:"btn", click:function(){
+    {view: "text", name: "course", label: "Курс"},
+    {view: "text", name: "spes", label: "Спец"},
+    { view:"button",  value:"Добавить",  id:"btn", click:function(){
       var values = this.getFormView().getValues();
      
 
-      webix.ajax().post("/api_sc/teacher/create", values, submitCallback);
+      webix.ajax().post("/api_sc/group/create", values, submitCallback);
     }}
   ]};
 
@@ -90,7 +91,6 @@ var top_menu_data = [
     { id:"2",value:"Группы", href: '/csp/irisapp/web.Gruppa.cls'},
     { id:"3",value:"Предметы", href: '/csp/irisapp/web.Lessons.cls'},
     { id:"4",value:"Студенты", href: '/csp/irisapp/web.Student.cls'}
-    
 ];
 var top_menu = {
     view:"menu",
@@ -109,7 +109,7 @@ var ui_template = {
   height: '100%',
   rows: [
   top_toolbar,
-    { view: "toolbar", padding:4, 
+    { view: "toolbar", padding:3, 
       elements: [
         { view: "button", type: "icon", icon: "mdi mdi-menu",
           width: 37, align: "left", css: "app_button", click: function(){
@@ -138,8 +138,8 @@ var ui_template = {
       },
       { id:"t1_content",
           cells:[
-            teacher_list_template,
-            teacher_form_template
+            group_list_template,
+            group_form_template
         ]   
       }
     ]}
